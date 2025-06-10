@@ -146,7 +146,7 @@ export default function App() {
               <span>Total:</span>
               <span>€ {totalCarrito.toFixed(2)}</span>
             </div>
-            <p className="text-xs mt-2">
+            <p className="text-xs mt-2 text-center">
               Actualmente los pedidos se realizan a través de whatsapp, si pulsa aquí cargará el carrito en el chat de whatsapp.
             </p>
             <button

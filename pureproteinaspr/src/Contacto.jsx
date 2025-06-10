@@ -8,10 +8,10 @@ export default function Contacto() {
             <p className="mb-6">Síguenos para estar al día con nuestras novedades y promociones:</p>
 
             <div className="flex justify-center space-x-6 text-4xl text-red-600 mb-6">
-                <a href="https://www.facebook.com/tu-pagina" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <a href="https://www.facebook.com/p/Pure-prote%C3%ADnas-Puerto-Real-100078641852707/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                     <FaFacebookSquare className="hover:text-red-800 transition-colors" />
                 </a>
-                <a href="https://www.instagram.com/tu-cuenta" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a href="https://www.instagram.com/pureproteinaspr/?igsh=MW4ya3g2ZGkyM3Vq#" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                     <FaInstagram className="hover:text-red-800 transition-colors" />
                 </a>
             </div>
