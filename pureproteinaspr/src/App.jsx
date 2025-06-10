@@ -130,18 +130,53 @@ export default function App() {
               ×
             </button>
             <h2 className="text-xl font-bold mb-4">Tu carrito</h2>
+
             {carrito.length === 0 ? (
               <p className="text-gray-600">No hay productos aún.</p>
             ) : (
               <ul className="divide-y divide-gray-300 mb-4 max-h-60 overflow-y-auto">
-                {carrito.map((item, idx) => (
-                  <li key={idx} className="py-2 flex justify-between text-sm">
-                    <span>{item.nombre}</span>
-                    <span className="font-semibold">€ {item.precio.toFixed(2)}</span>
+                {Object.entries(
+                  carrito.reduce((acc, item) => {
+                    acc[item.nombre] = acc[item.nombre] || { ...item, cantidad: 0 };
+                    acc[item.nombre].cantidad += 1;
+                    return acc;
+                  }, {})
+                ).map(([nombre, item], idx) => (
+                  <li key={idx} className="py-2 flex justify-between items-center text-sm">
+                    <span>{nombre}</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          setCarrito((prev) => {
+                            const index = prev.findIndex((p) => p.nombre === nombre);
+                            if (index !== -1) {
+                              const nueva = [...prev];
+                              nueva.splice(index, 1);
+                              return nueva;
+                            }
+                            return prev;
+                          })
+                        }
+                        className="px-2 py-0.5 bg-gray-200 rounded-full text-lg font-semibold"
+                      >
+                        −
+                      </button>
+                      <span>{item.cantidad}</span>
+                      <button
+                        onClick={() =>
+                          setCarrito((prev) => [...prev, { nombre: item.nombre, precio: item.precio }])
+                        }
+                        className="px-2 py-0.5 bg-gray-200 rounded-full text-lg font-semibold"
+                      >
+                        +
+                      </button>
+                      <span className="font-semibold">€ {(item.precio * item.cantidad).toFixed(2)}</span>
+                    </div>
                   </li>
                 ))}
               </ul>
             )}
+
             <div className="flex justify-between font-bold text-lg">
               <span>Total:</span>
               <span>€ {totalCarrito.toFixed(2)}</span>
@@ -158,6 +193,7 @@ export default function App() {
           </div>
         </div>
       )}
+
 
       <button
         className="fixed bottom-4 right-4 p-2 bg-green-500 rounded-full shadow-lg hover:scale-105 transition"
