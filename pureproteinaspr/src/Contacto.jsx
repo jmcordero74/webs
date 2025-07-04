@@ -18,10 +18,13 @@ export default function Contacto() {
 
             <div className="text-left text-gray-700">
                 <h3 className="text-xl font-semibold mb-2 text-center">Horario de atención</h3>
-                <ul className="space-y-1">
-                    <li><strong>Lunes a Jueves:</strong> 10:00h - 14:00h / 17:30h - 20:30h</li>
-                    <li><strong>Viernes:</strong> 10:00h - 14:00h / 17:30h - 21:30h</li>
-                    <li><strong>Sábados:</strong> 9:30h - 13:30h</li>
+                <ul className="space-y-1 text-center">
+                    <li><strong>Lunes a Jueves</strong></li>
+                    <li>10:00h - 14:00h / 17:30h - 20:30h</li>
+                    <li><strong>Viernes</strong></li> 
+                    <li>10:00h - 14:00h / 17:30h - 21:30h</li>
+                    <li><strong>Sábados</strong></li> 
+                    <li>9:30h - 13:30h</li>
                 </ul>
             </div>
 

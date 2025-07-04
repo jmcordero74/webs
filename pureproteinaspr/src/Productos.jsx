@@ -10,7 +10,7 @@ export default function Productos({ añadirAlCarrito }) {
 
     const productosPorPagina = 6;
 
-    const filtrados = productos.filter(
+    const filtrados = productos.filter((p) => p.activo !== false).filter(
         (p) => p.precio >= precioMin && p.precio <= precioMax
     );
 
@@ -68,9 +68,13 @@ export default function Productos({ añadirAlCarrito }) {
                 {paginados.map((item) => (
                     <div
                         key={item.id}
-                        className="group bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                        className={`group shadow rounded-xl overflow-hidden transition-shadow duration-300 ${!item.stock ? 'bg-gray-200 cursor-not-allowed opacity-50' : 'bg-white hover:shadow-lg'
+                            }`}
                     >
-                        <div className="overflow-hidden h-40 cursor-pointer" onClick={() => setProductoSeleccionado(item)}>
+                        <div
+                            className={`overflow-hidden h-40 ${item.stock ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                            onClick={() => item.stock && setProductoSeleccionado(item)}
+                        >
                             <img
                                 src={item.imagen}
                                 alt={item.nombre}
@@ -79,7 +83,7 @@ export default function Productos({ añadirAlCarrito }) {
                         </div>
                         <div className="p-4">
                             <h4 className="text-lg font-bold mb-2 group-hover:text-red-600 transition-colors duration-300">{item.nombre}</h4>
-                            <p className="text-sm text-gray-600 mb-2">{item.descripcion}</p>
+                            <p className="text-sm text-gray-600 mb-2">{item.descripcionCorta}</p>
 
                             <div className="flex justify-between items-center">
                                 <p className={`font-semibold text-base ${item.precioAntiguo ? 'text-green-600' : 'text-gray-800'}`}>
@@ -93,10 +97,14 @@ export default function Productos({ añadirAlCarrito }) {
                                 )}
 
                                 <button
-                                    onClick={() => añadirAlCarrito(item)}
-                                    className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-full ml-auto"
+                                    disabled={!item.stock}
+                                    onClick={() => item.stock && añadirAlCarrito(item)}
+                                    className={`text-sm px-4 py-2 rounded-full ml-auto ${item.stock
+                                            ? 'bg-red-600 hover:bg-red-700 text-white'
+                                            : 'bg-gray-400 text-white cursor-not-allowed'
+                                        }`}
                                 >
-                                    Comprar
+                                    {item.stock ? 'Comprar' : 'Sin stock'}
                                 </button>
                             </div>
                         </div>
@@ -132,7 +140,7 @@ export default function Productos({ añadirAlCarrito }) {
                     onClick={() => setProductoSeleccionado(null)}
                 >
                     <div
-                        className="bg-white rounded-lg p-6 max-w-md w-full relative"
+                        className="bg-white rounded-lg p-6 max-w-5xl w-full relative"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
@@ -142,36 +150,56 @@ export default function Productos({ añadirAlCarrito }) {
                         >
                             ×
                         </button>
-                        <img
-                            src={productoSeleccionado.imagen}
-                            alt={productoSeleccionado.nombre}
-                            className="w-full h-64 object-cover rounded mb-4"
-                        />
-                        <h2 className="text-2xl font-bold mb-2">{productoSeleccionado.nombre}</h2>
-                        <p className="mb-4 text-gray-700">{productoSeleccionado.descripcion}</p>
 
-                        <div className="flex items-center mb-4">
-                            <span className={`font-semibold text-xl ${productoSeleccionado.precioAntiguo ? 'text-green-600' : 'text-red-600'}`}>
-                                € {productoSeleccionado.precio.toFixed(2)}
-                            </span>
-                            {productoSeleccionado.precioAntiguo && (
-                                <span className="text-black line-through ml-4 text-base">
-                                    € {productoSeleccionado.precioAntiguo.toFixed(2)}
-                                </span>
-                            )}
-                            <button
-                                onClick={() => {
-                                    añadirAlCarrito(productoSeleccionado);
-                                    setProductoSeleccionado(null); // cerrar modal al comprar
-                                }}
-                                className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-full ml-auto"
-                            >
-                                Comprar
-                            </button>
+                        <div className="flex flex-col md:flex-row gap-6">
+                            {/* Imagen e ingredientes */}
+                            <div className="md:w-1/2">
+                                <img
+                                    src={productoSeleccionado.imagen}
+                                    alt={productoSeleccionado.nombre}
+                                    className="w-full h-100 object-cover rounded mb-4 md:mb-6"
+                                />
+
+                                <h3 className="text-lg font-semibold mb-2">Ingredientes:</h3>
+                                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 max-h-40 overflow-y-auto pr-2">
+                                    {productoSeleccionado.ingredientes.map((ing, idx) => (
+                                        <li key={idx}>{ing}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Descripción y precio */}
+                            <div className="md:w-1/2 flex flex-col justify-between">
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-4">{productoSeleccionado.nombre}</h2>
+                                    <p className="text-gray-700 mb-6">{productoSeleccionado.descripcion}</p>
+                                </div>
+
+                                <div className="flex items-center justify-end mt-6">
+                                    <span className={`font-semibold text-xl ${productoSeleccionado.precioAntiguo ? 'text-green-600' : 'text-red-600'}`}>
+                                        € {productoSeleccionado.precio.toFixed(2)}
+                                    </span>
+                                    {productoSeleccionado.precioAntiguo && (
+                                        <span className="text-black line-through ml-4 text-base">
+                                            € {productoSeleccionado.precioAntiguo.toFixed(2)}
+                                        </span>
+                                    )}
+                                    <button
+                                        onClick={() => {
+                                            añadirAlCarrito(productoSeleccionado);
+                                            setProductoSeleccionado(null);
+                                        }}
+                                        className="bg-red-600 hover:bg-red-700 text-white text-sm px-6 py-2 rounded-full ml-6"
+                                    >
+                                        Comprar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
+
         </section>
     );
 }

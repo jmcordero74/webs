@@ -1,16 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo1 from '/imgs/logorecortado.jpeg';
 import whatsapp from '/imgs/ico-wa.png';
 import carritoImg from '/imgs/ico-cart.png';
 import Contacto from './Contacto';
 import Productos from './Productos';
 import Ofertas from './Ofertas';
+import QuienesSomos from './QuienesSomos';
 
 export default function App() {
   const [pantalla, setPantalla] = useState('inicio');
   const [carrito, setCarrito] = useState([]);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [actual, setActual] = useState(0);
+
+
+  const imagenes = [
+    "/imgs/tienda/tienda1.jpeg",
+    "/imgs/tienda/tienda2.jpeg",
+    "/imgs/tienda/tienda3.jpeg",
+    "/imgs/tienda/tienda4.jpeg",
+  ];
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setActual((prev) => (prev + 1) % imagenes.length);
+    }, 4000); // Cambia cada 4 segundos
+
+    return () => clearInterval(intervalo); // Limpiar al desmontar
+  }, [imagenes.length]);
+
+
+  const siguiente = () => setActual((actual + 1) % imagenes.length);
+  const anterior = () => setActual((actual - 1 + imagenes.length) % imagenes.length);
 
   const agregarAlCarrito = (producto) => {
     setCarrito((prev) => [...prev, producto]);
@@ -39,7 +61,7 @@ export default function App() {
 
     mensaje += `\nTotal: €${totalCarrito.toFixed(2)}\n\n¡Gracias!`;
 
-    const url = `https://wa.me/34600000000?text=${encodeURIComponent(mensaje)}`;
+    const url = `https://wa.me/34611661109?text=${encodeURIComponent(mensaje)}`;
     window.open(url, "_blank");
   };
 
@@ -49,7 +71,6 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <img src={logo1} alt="Logo" className="h-16" />
 
-          {/* Menú móvil: botón hamburguesa + carrito */}
           <div className="md:hidden flex items-center gap-4">
             <button onClick={() => setMenuAbierto(!menuAbierto)}>
               ☰
@@ -66,7 +87,7 @@ export default function App() {
 
           {/* Menú de navegación */}
           <nav className={`absolute md:static top-full left-0 w-full md:w-auto bg-black md:bg-transparent z-50 md:flex items-center space-y-2 md:space-y-0 md:space-x-6 text-white font-semibold p-4 md:p-0 transition-all duration-300 ${menuAbierto ? 'block' : 'hidden'}`}>
-            {["inicio", "productos", "novedades", "top", "ofertas", "contacto"].map((pant) => (
+            {["inicio", "productos", "ofertas", "¿Quienes Somos?", "contacto"].map((pant) => (
               <a
                 key={pant}
                 href="#"
@@ -100,10 +121,56 @@ export default function App() {
         {pantalla === 'inicio' && (
           <section className="bg-gray-100 py-16">
             <div className="max-w-7xl mx-auto text-center px-4">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Explora nuestros productos</h2>
-              <p className="text-lg mb-6">Encuentra todo lo que necesitas para mantenerte activo.</p>
+
+              <div >
+                <div className="relative">
+                  <img
+                    src={imagenes[actual]}
+                    alt={`Foto tienda ${actual + 1}`}
+                    className="w-full h-72 object-cover rounded-xl shadow-lg transition duration-500"
+                  />
+                  <button
+                    onClick={() => setActual((actual - 1 + imagenes.length) % imagenes.length)}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-80"
+                    aria-label="Anterior"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={() => setActual((actual + 1) % imagenes.length)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-80"
+                    aria-label="Siguiente"
+                  >
+                    ›
+                  </button>
+                </div>
+
+                {/* Indicadores */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {imagenes.map((_, i) => (
+                    <button
+                      key={i}
+                      className={`w-3 h-3 rounded-full ${i === actual ? 'bg-red-600' : 'bg-gray-300'}`}
+                      onClick={() => setActual(i)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Bienvenidos a PureProteínas</h2>
+              <p className="text-lg mb-6">
+                En Pure Proteína PR creemos que la nutrición deportiva es mucho más que vender suplementos:
+                es cuidarte como parte de una familia que te apoya y escucha.
+                Cada persona es única, por eso te ofrecemos trato personalizado, cercanía y productos de máxima calidad, seguros y efectivos para tus metas.
+                Aquí encontrarás asesoría real y un equipo siempre contigo, motivándote a dar ese paso hacia tu mejor versión.
+              </p>
+              <p className="text-lg mb-6 font-bold">
+                Bienvenido a #PureFamily. Do it now / Hazlo ahora.
+              </p>
+
+              {/* Botón catálogo */}
               <button
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full"
+                className="mt-12 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full"
                 onClick={() => setPantalla('productos')}
               >
                 Ver catálogo
@@ -115,6 +182,7 @@ export default function App() {
         {pantalla === 'contacto' && <Contacto />}
         {pantalla === 'productos' && <Productos añadirAlCarrito={agregarAlCarrito} />}
         {pantalla === 'ofertas' && <Ofertas />}
+        {pantalla === '¿Quienes Somos?' && <QuienesSomos />}
       </main>
 
       {mostrarCarrito && (
@@ -197,7 +265,7 @@ export default function App() {
 
       <button
         className="fixed bottom-4 right-4 p-2 bg-green-500 rounded-full shadow-lg hover:scale-105 transition"
-        onClick={() => window.open('https://wa.me/34600000000', '_blank')}
+        onClick={() => window.open('https://wa.me/34611661109', '_blank')}
       >
         <img src={whatsapp} alt="WhatsApp" className="h-10 md:h-16" />
       </button>
