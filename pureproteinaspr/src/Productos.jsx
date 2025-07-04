@@ -100,8 +100,8 @@ export default function Productos({ añadirAlCarrito }) {
                                     disabled={!item.stock}
                                     onClick={() => item.stock && añadirAlCarrito(item)}
                                     className={`text-sm px-4 py-2 rounded-full ml-auto ${item.stock
-                                            ? 'bg-red-600 hover:bg-red-700 text-white'
-                                            : 'bg-gray-400 text-white cursor-not-allowed'
+                                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                                        : 'bg-gray-400 text-white cursor-not-allowed'
                                         }`}
                                 >
                                     {item.stock ? 'Comprar' : 'Sin stock'}
@@ -136,28 +136,30 @@ export default function Productos({ añadirAlCarrito }) {
             {/* Modal */}
             {productoSeleccionado && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2"
                     onClick={() => setProductoSeleccionado(null)}
                 >
                     <div
-                        className="bg-white rounded-lg p-6 max-w-5xl w-full relative"
+                        className="bg-white rounded-lg p-4 md:p-6 max-w-5xl w-full relative max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
+                        {/* Botón cerrar */}
                         <button
                             onClick={() => setProductoSeleccionado(null)}
-                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 font-bold text-xl"
+                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 font-bold text-2xl"
                             aria-label="Cerrar modal"
                         >
                             ×
                         </button>
 
-                        <div className="flex flex-col md:flex-row gap-6">
+                        {/* Contenido principal */}
+                        <div className="flex flex-col md:flex-row gap-4 md:gap-6 mt-6">
                             {/* Imagen e ingredientes */}
                             <div className="md:w-1/2">
                                 <img
                                     src={productoSeleccionado.imagen}
                                     alt={productoSeleccionado.nombre}
-                                    className="w-full h-100 object-cover rounded mb-4 md:mb-6"
+                                    className="w-full h-64 md:h-96 object-cover rounded mb-4"
                                 />
 
                                 <h3 className="text-lg font-semibold mb-2">Ingredientes:</h3>
@@ -175,12 +177,12 @@ export default function Productos({ añadirAlCarrito }) {
                                     <p className="text-gray-700 mb-6">{productoSeleccionado.descripcion}</p>
                                 </div>
 
-                                <div className="flex items-center justify-end mt-6">
+                                <div className="flex flex-wrap items-center justify-end gap-4 mt-4 md:mt-6">
                                     <span className={`font-semibold text-xl ${productoSeleccionado.precioAntiguo ? 'text-green-600' : 'text-red-600'}`}>
                                         € {productoSeleccionado.precio.toFixed(2)}
                                     </span>
                                     {productoSeleccionado.precioAntiguo && (
-                                        <span className="text-black line-through ml-4 text-base">
+                                        <span className="text-black line-through text-base">
                                             € {productoSeleccionado.precioAntiguo.toFixed(2)}
                                         </span>
                                     )}
@@ -189,7 +191,7 @@ export default function Productos({ añadirAlCarrito }) {
                                             añadirAlCarrito(productoSeleccionado);
                                             setProductoSeleccionado(null);
                                         }}
-                                        className="bg-red-600 hover:bg-red-700 text-white text-sm px-6 py-2 rounded-full ml-6"
+                                        className="bg-red-600 hover:bg-red-700 text-white text-sm px-6 py-2 rounded-full"
                                     >
                                         Comprar
                                     </button>
@@ -199,6 +201,7 @@ export default function Productos({ añadirAlCarrito }) {
                     </div>
                 </div>
             )}
+
 
         </section>
     );
