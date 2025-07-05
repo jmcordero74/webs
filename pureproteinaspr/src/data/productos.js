@@ -16,6 +16,7 @@ const productos = [
     precioAntiguo:35.50,
     imagen: "/imgs/productos/ISOprotein.webp",
     marca: "X-UP",
+    categoria: "proteina",
     stock: true,
     activo: true
   },
@@ -36,6 +37,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/productos/wheyprotein.webp",
     marca: "X-UP",
+    categoria: "proteina",
     stock: true,
     activo: true
   },
@@ -50,6 +52,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/productos/KREALKALYN.webp",
     marca: "X-UP",
+    categoria: "kreatina",
     stock: true,
     activo: true
   },
@@ -64,6 +67,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/productos/COLAGENO_MAS_MAGNESIO.webp",
     marca: "X-UP",
+    categoria: "vitaminas",
     stock: true,
     activo: true
   },
@@ -84,6 +88,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/producto2.jpeg",
     marca: "X-UP",
+    categoria: "proteina",
     activo: false
   },
   {
@@ -103,6 +108,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/producto2.jpeg",
     marca: "X-UP",
+    categoria: "proteina",
     activo: false
   },
   {
@@ -122,6 +128,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/producto2.jpeg",
     marca: "X-UP",
+    categoria: "proteina",
     activo: false
   },
   {
@@ -141,6 +148,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/producto2.jpeg",
     marca: "X-UP",
+    categoria: "proteina",
     activo: false
   },
   {
@@ -160,6 +168,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/producto2.jpeg",
     marca: "X-UP",
+    categoria: "proteina",
     activo: false
   },
   {
@@ -179,6 +188,7 @@ const productos = [
     precio: 19.99,
     imagen: "/imgs/producto2.jpeg",
     marca: "X-UP",
+    categoria: "proteina",
     activo: false
   },
 ];

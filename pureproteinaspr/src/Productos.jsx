@@ -6,13 +6,21 @@ export default function Productos({ añadirAlCarrito }) {
     const [precioMin, setPrecioMin] = useState(0);
     const [precioMax, setPrecioMax] = useState(100);
     const [orden, setOrden] = useState('asc');
+    const [marcaSeleccionada, setMarcaSeleccionada] = useState(''); // Nueva marca seleccionada (vacío = todas)
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(''); // Nueva categoría seleccionada (vacío = todas)
     const [productoSeleccionado, setProductoSeleccionado] = useState(null); // para el modal
 
     const productosPorPagina = 6;
 
-    const filtrados = productos.filter((p) => p.activo !== false).filter(
-        (p) => p.precio >= precioMin && p.precio <= precioMax
-    );
+    // Extraemos marcas únicas y categorías únicas del listado completo de productos
+    const marcasUnicas = [...new Set(productos.map(p => p.marca))];
+    const categoriasUnicas = [...new Set(productos.map(p => p.categoria))];
+
+    // Aplicamos todos los filtros: activo, precio, marca, categoría
+    const filtrados = productos.filter(p => p.activo !== false)
+        .filter(p => p.precio >= precioMin && p.precio <= precioMax)
+        .filter(p => !marcaSeleccionada || p.marca === marcaSeleccionada)
+        .filter(p => !categoriaSeleccionada || p.categoria === categoriaSeleccionada);
 
     const ordenados = filtrados.sort((a, b) =>
         orden === 'asc' ? a.precio - b.precio : b.precio - a.precio
@@ -25,6 +33,11 @@ export default function Productos({ añadirAlCarrito }) {
     const cambiarPagina = (nueva) => {
         if (nueva >= 1 && nueva <= totalPaginas) setPaginaActual(nueva);
     };
+
+    // Cuando cambie un filtro, volvemos a la página 1
+    React.useEffect(() => {
+        setPaginaActual(1);
+    }, [precioMin, precioMax, orden, marcaSeleccionada, categoriaSeleccionada]);
 
     return (
         <section className="max-w-7xl mx-auto py-12 px-4">
@@ -61,6 +74,42 @@ export default function Productos({ añadirAlCarrito }) {
                         <option value="desc">Precio: mayor a menor</option>
                     </select>
                 </div>
+
+                {/* Nuevo filtro desplegable de marcas */}
+                <div>
+                    <label className="mr-2 font-semibold">Marca:</label>
+                    <select
+                        value={marcaSeleccionada}
+                        onChange={(e) => setMarcaSeleccionada(e.target.value)}
+                        className="border rounded px-2 py-1"
+                    >
+                        <option value="">Todas</option>
+                        {marcasUnicas.map((marca) => (
+                            <option key={marca} value={marca}>
+                                {marca}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {/* Botones para filtrar por categoría */}
+            <div className="flex flex-wrap gap-3 mb-8">
+                <button
+                    onClick={() => setCategoriaSeleccionada('')}
+                    className={`px-4 py-2 rounded-full border ${categoriaSeleccionada === '' ? 'bg-red-600 text-white' : 'bg-white text-black'}`}
+                >
+                    Todas
+                </button>
+                {categoriasUnicas.map((cat) => (
+                    <button
+                        key={cat}
+                        onClick={() => setCategoriaSeleccionada(cat)}
+                        className={`px-4 py-2 rounded-full border ${categoriaSeleccionada === cat ? 'bg-red-600 text-white' : 'bg-white text-black'}`}
+                    >
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </button>
+                ))}
             </div>
 
             {/* Productos */}
@@ -155,19 +204,12 @@ export default function Productos({ añadirAlCarrito }) {
                         {/* Contenido principal */}
                         <div className="flex flex-col md:flex-row gap-4 md:gap-6 mt-6">
                             {/* Imagen e ingredientes */}
-                            <div className="md:w-1/2">
+                            <div className="md:w-1/1">
                                 <img
                                     src={productoSeleccionado.imagen}
                                     alt={productoSeleccionado.nombre}
                                     className="w-full h-64 md:h-96 object-cover rounded mb-4"
                                 />
-
-                                <h3 className="text-lg font-semibold mb-2">Ingredientes:</h3>
-                                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 max-h-40 overflow-y-auto pr-2">
-                                    {productoSeleccionado.ingredientes.map((ing, idx) => (
-                                        <li key={idx}>{ing}</li>
-                                    ))}
-                                </ul>
                             </div>
 
                             {/* Descripción y precio */}
@@ -176,6 +218,13 @@ export default function Productos({ añadirAlCarrito }) {
                                     <h2 className="text-2xl font-bold mb-4">{productoSeleccionado.nombre}</h2>
                                     <p className="text-gray-700 mb-6">{productoSeleccionado.descripcion}</p>
                                 </div>
+
+                                <h3 className="text-lg font-semibold mb-2">Ingredientes:</h3>
+                                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 max-h-40 overflow-y-auto pr-2">
+                                    {productoSeleccionado.ingredientes.map((ing, idx) => (
+                                        <li key={idx}>{ing}</li>
+                                    ))}
+                                </ul>
 
                                 <div className="flex flex-wrap items-center justify-end gap-4 mt-4 md:mt-6">
                                     <span className={`font-semibold text-xl ${productoSeleccionado.precioAntiguo ? 'text-green-600' : 'text-red-600'}`}>
@@ -201,8 +250,6 @@ export default function Productos({ añadirAlCarrito }) {
                     </div>
                 </div>
             )}
-
-
         </section>
     );
 }

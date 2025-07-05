@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import logo1 from '/imgs/logorecortado.jpeg';
-import whatsapp from '/imgs/ico-wa.png';
+import whatsapp from '/imgs/ico_wa.png';
 import carritoImg from '/imgs/ico-cart.png';
 import Contacto from './Contacto';
 import Productos from './Productos';
@@ -175,6 +175,7 @@ export default function App() {
               >
                 Ver catálogo
               </button>
+              
             </div>
           </section>
         )}
@@ -264,10 +265,10 @@ export default function App() {
 
 
       <button
-        className="fixed bottom-4 right-4 p-2 bg-green-500 rounded-full shadow-lg hover:scale-105 transition"
+        className="fixed bottom-4 right-4 p-2 rounded-full shadow-lg hover:scale-105 transition"
         onClick={() => window.open('https://wa.me/34611661109', '_blank')}
       >
-        <img src={whatsapp} alt="WhatsApp" className="h-10 md:h-16" />
+        <img src={whatsapp} alt="WhatsApp" className="h-20 md:h-26" />
       </button>
 
       <footer className="bg-black text-white text-center py-6 px-4 mt-10 text-sm">
