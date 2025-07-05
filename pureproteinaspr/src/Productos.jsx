@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import productos from './data/productos';
 
 export default function Productos({ añadirAlCarrito }) {
@@ -6,17 +6,15 @@ export default function Productos({ añadirAlCarrito }) {
     const [precioMin, setPrecioMin] = useState(0);
     const [precioMax, setPrecioMax] = useState(100);
     const [orden, setOrden] = useState('asc');
-    const [marcaSeleccionada, setMarcaSeleccionada] = useState(''); // Nueva marca seleccionada (vacío = todas)
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(''); // Nueva categoría seleccionada (vacío = todas)
-    const [productoSeleccionado, setProductoSeleccionado] = useState(null); // para el modal
+    const [marcaSeleccionada, setMarcaSeleccionada] = useState('');
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
+    const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
     const productosPorPagina = 6;
 
-    // Extraemos marcas únicas y categorías únicas del listado completo de productos
     const marcasUnicas = [...new Set(productos.map(p => p.marca))];
     const categoriasUnicas = [...new Set(productos.map(p => p.categoria))];
 
-    // Aplicamos todos los filtros: activo, precio, marca, categoría
     const filtrados = productos.filter(p => p.activo !== false)
         .filter(p => p.precio >= precioMin && p.precio <= precioMax)
         .filter(p => !marcaSeleccionada || p.marca === marcaSeleccionada)
@@ -34,8 +32,7 @@ export default function Productos({ añadirAlCarrito }) {
         if (nueva >= 1 && nueva <= totalPaginas) setPaginaActual(nueva);
     };
 
-    // Cuando cambie un filtro, volvemos a la página 1
-    React.useEffect(() => {
+    useEffect(() => {
         setPaginaActual(1);
     }, [precioMin, precioMax, orden, marcaSeleccionada, categoriaSeleccionada]);
 
@@ -75,7 +72,7 @@ export default function Productos({ añadirAlCarrito }) {
                     </select>
                 </div>
 
-                {/* Nuevo filtro desplegable de marcas */}
+                {/* Marca */}
                 <div>
                     <label className="mr-2 font-semibold">Marca:</label>
                     <select
@@ -93,7 +90,7 @@ export default function Productos({ añadirAlCarrito }) {
                 </div>
             </div>
 
-            {/* Botones para filtrar por categoría */}
+            {/* Categorías */}
             <div className="flex flex-wrap gap-3 mb-8">
                 <button
                     onClick={() => setCategoriaSeleccionada('')}
@@ -114,51 +111,61 @@ export default function Productos({ añadirAlCarrito }) {
 
             {/* Productos */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {paginados.map((item) => (
-                    <div
-                        key={item.id}
-                        className={`group shadow rounded-xl overflow-hidden transition-shadow duration-300 ${!item.stock ? 'bg-gray-200 cursor-not-allowed opacity-50' : 'bg-white hover:shadow-lg'
-                            }`}
-                    >
+                {paginados.map((item) => {
+                    const tieneDescuento = item.descuento && item.descuento > 0;
+                    const precioFinal = tieneDescuento
+                        ? item.precio * (1 - item.descuento / 100)
+                        : item.precio;
+
+                    return (
                         <div
-                            className={`overflow-hidden h-40 ${item.stock ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                            onClick={() => item.stock && setProductoSeleccionado(item)}
+                            key={item.id}
+                            className={`group shadow rounded-xl overflow-hidden transition-shadow duration-300 ${!item.stock ? 'bg-gray-200 cursor-not-allowed opacity-50' : 'bg-white hover:shadow-lg'}`}
                         >
-                            <img
-                                src={item.imagen}
-                                alt={item.nombre}
-                                className="w-full h-full object-cover transform group-hover:scale-110 transition duration-300"
-                            />
-                        </div>
-                        <div className="p-4">
-                            <h4 className="text-lg font-bold mb-2 group-hover:text-red-600 transition-colors duration-300">{item.nombre}</h4>
-                            <p className="text-sm text-gray-600 mb-2">{item.descripcionCorta}</p>
+                            <div
+                                className={`overflow-hidden h-40 ${item.stock ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                                onClick={() => item.stock && setProductoSeleccionado(item)}
+                            >
+                                <img
+                                    src={item.imagen}
+                                    alt={item.nombre}
+                                    className="w-full h-full object-cover transform group-hover:scale-110 transition duration-300"
+                                />
+                            </div>
+                            <div className="p-4">
+                                <h4 className="text-lg font-bold mb-2 group-hover:text-red-600 transition-colors duration-300">{item.nombre}</h4>
+                                <p className="text-sm text-gray-600 mb-2">{item.descripcionCorta}</p>
 
-                            <div className="flex justify-between items-center">
-                                <p className={`font-semibold text-base ${item.precioAntiguo ? 'text-green-600' : 'text-gray-800'}`}>
-                                    € {item.precio.toFixed(2)}
-                                </p>
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className={`font-semibold text-base ${tieneDescuento ? 'text-green-600' : 'text-gray-800'}`}>
+                                            € {precioFinal.toFixed(2)}
+                                        </p>
+                                        {tieneDescuento && (
+                                            <div className="text-sm text-gray-500 flex items-center gap-2">
+                                                <span className="line-through">€ {item.precio.toFixed(2)}</span>
+                                                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+                                                    -{item.descuento}%
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                {item.precioAntiguo && (
-                                    <p className="text-sm text-black line-through ml-4">
-                                        € {item.precioAntiguo.toFixed(2)}
-                                    </p>
-                                )}
-
-                                <button
-                                    disabled={!item.stock}
-                                    onClick={() => item.stock && añadirAlCarrito(item)}
-                                    className={`text-sm px-4 py-2 rounded-full ml-auto ${item.stock
-                                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                                        : 'bg-gray-400 text-white cursor-not-allowed'
-                                        }`}
-                                >
-                                    {item.stock ? 'Comprar' : 'Sin stock'}
-                                </button>
+                                    <button
+                                        disabled={!item.stock}
+                                        onClick={() => item.stock && añadirAlCarrito(item)}
+                                        className={`text-sm px-4 py-2 rounded-full ml-auto ${item.stock
+                                            ? 'bg-red-600 hover:bg-red-700 text-white'
+                                            : 'bg-gray-400 text-white cursor-not-allowed'
+                                            }`}
+                                    >
+                                        {item.stock ? 'Comprar' : 'Sin stock'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Paginación */}
@@ -182,74 +189,83 @@ export default function Productos({ añadirAlCarrito }) {
                 </button>
             </div>
 
-            {/* Modal */}
-            {productoSeleccionado && (
-                <div
-                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2"
-                    onClick={() => setProductoSeleccionado(null)}
-                >
+            {/* Modal de producto */}
+            {productoSeleccionado && (() => {
+                const tieneDescuento = productoSeleccionado.descuento && productoSeleccionado.descuento > 0;
+                const precioFinal = tieneDescuento
+                    ? productoSeleccionado.precio * (1 - productoSeleccionado.descuento / 100)
+                    : productoSeleccionado.precio;
+
+                return (
                     <div
-                        className="bg-white rounded-lg p-4 md:p-6 max-w-5xl w-full relative max-h-[90vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
+                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2"
+                        onClick={() => setProductoSeleccionado(null)}
                     >
-                        {/* Botón cerrar */}
-                        <button
-                            onClick={() => setProductoSeleccionado(null)}
-                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 font-bold text-2xl"
-                            aria-label="Cerrar modal"
+                        <div
+                            className="bg-white rounded-lg p-4 md:p-6 max-w-5xl w-full relative max-h-[90vh] overflow-y-auto"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            ×
-                        </button>
+                            <button
+                                onClick={() => setProductoSeleccionado(null)}
+                                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 font-bold text-2xl"
+                                aria-label="Cerrar modal"
+                            >
+                                ×
+                            </button>
 
-                        {/* Contenido principal */}
-                        <div className="flex flex-col md:flex-row gap-4 md:gap-6 mt-6">
-                            {/* Imagen e ingredientes */}
-                            <div className="md:w-1/1">
-                                <img
-                                    src={productoSeleccionado.imagen}
-                                    alt={productoSeleccionado.nombre}
-                                    className="w-full h-64 md:h-96 object-cover rounded mb-4"
-                                />
-                            </div>
-
-                            {/* Descripción y precio */}
-                            <div className="md:w-1/2 flex flex-col justify-between">
-                                <div>
-                                    <h2 className="text-2xl font-bold mb-4">{productoSeleccionado.nombre}</h2>
-                                    <p className="text-gray-700 mb-6">{productoSeleccionado.descripcion}</p>
+                            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mt-6">
+                                <div className="md:w-1/1">
+                                    <img
+                                        src={productoSeleccionado.imagen}
+                                        alt={productoSeleccionado.nombre}
+                                        className="w-full h-64 md:h-96 object-cover rounded mb-4"
+                                    />
                                 </div>
 
-                                <h3 className="text-lg font-semibold mb-2">Ingredientes:</h3>
-                                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 max-h-40 overflow-y-auto pr-2">
-                                    {productoSeleccionado.ingredientes.map((ing, idx) => (
-                                        <li key={idx}>{ing}</li>
-                                    ))}
-                                </ul>
+                                <div className="md:w-1/2 flex flex-col justify-between">
+                                    <div>
+                                        <h2 className="text-2xl font-bold mb-4">{productoSeleccionado.nombre}</h2>
+                                        <p className="text-gray-700 mb-6">{productoSeleccionado.descripcion}</p>
+                                    </div>
 
-                                <div className="flex flex-wrap items-center justify-end gap-4 mt-4 md:mt-6">
-                                    <span className={`font-semibold text-xl ${productoSeleccionado.precioAntiguo ? 'text-green-600' : 'text-red-600'}`}>
-                                        € {productoSeleccionado.precio.toFixed(2)}
-                                    </span>
-                                    {productoSeleccionado.precioAntiguo && (
-                                        <span className="text-black line-through text-base">
-                                            € {productoSeleccionado.precioAntiguo.toFixed(2)}
+                                    <h3 className="text-lg font-semibold mb-2">Ingredientes:</h3>
+                                    <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 max-h-40 overflow-y-auto pr-2">
+                                        {productoSeleccionado.ingredientes.map((ing, idx) => (
+                                            <li key={idx}>{ing}</li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="flex flex-wrap items-center justify-end gap-4 mt-4 md:mt-6">
+                                        <span className={`font-semibold text-xl ${tieneDescuento ? 'text-green-600' : 'text-red-600'}`}>
+                                            € {precioFinal.toFixed(2)}
                                         </span>
-                                    )}
-                                    <button
-                                        onClick={() => {
-                                            añadirAlCarrito(productoSeleccionado);
-                                            setProductoSeleccionado(null);
-                                        }}
-                                        className="bg-red-600 hover:bg-red-700 text-white text-sm px-6 py-2 rounded-full"
-                                    >
-                                        Comprar
-                                    </button>
+
+                                        <span className={`text-black text-base`}>
+                                            (-{productoSeleccionado.descuento}%)
+                                        </span>
+
+                                        {tieneDescuento && (
+                                            <span className="text-black line-through text-base">
+                                                € {productoSeleccionado.precio.toFixed(2)}
+                                            </span>
+                                        )}
+
+                                        <button
+                                            onClick={() => {
+                                                añadirAlCarrito(productoSeleccionado);
+                                                setProductoSeleccionado(null);
+                                            }}
+                                            className="bg-red-600 hover:bg-red-700 text-white text-sm px-6 py-2 rounded-full"
+                                        >
+                                            Comprar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
         </section>
     );
 }

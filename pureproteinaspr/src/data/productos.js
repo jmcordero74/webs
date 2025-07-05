@@ -13,7 +13,7 @@ const productos = [
       "CHOCOLATE: Proteína de suero de LECHE aislada [proteína de suero de LECHE aislada, emulgente: lecitina de SOJA] (91.2%), cacao en polvo [cacao desgrasado, corrector de acidez: carbonato potásico, emulgente: lecitinas (girasol)], aromas, espesante: goma xantana, sal marina, edulcorantes: sucralosa y acesulfamo potásico.",
     ],
     precio: 29.99,
-    precioAntiguo:35.50,
+    descuento: 10,
     imagen: "/imgs/productos/ISOprotein.webp",
     marca: "X-UP",
     categoria: "proteina",

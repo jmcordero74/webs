@@ -14,7 +14,6 @@ export default function App() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [actual, setActual] = useState(0);
 
-
   const imagenes = [
     "/imgs/tienda/tienda1.jpeg",
     "/imgs/tienda/tienda2.jpeg",
@@ -30,15 +29,18 @@ export default function App() {
     return () => clearInterval(intervalo); // Limpiar al desmontar
   }, [imagenes.length]);
 
-
   const siguiente = () => setActual((actual + 1) % imagenes.length);
   const anterior = () => setActual((actual - 1 + imagenes.length) % imagenes.length);
 
   const agregarAlCarrito = (producto) => {
-    setCarrito((prev) => [...prev, producto]);
+    const precioConDescuento = producto.descuento
+      ? producto.precio * (1 - producto.descuento / 100)
+      : producto.precio;
+
+    setCarrito((prev) => [...prev, { ...producto, precioFinal: precioConDescuento }]);
   };
 
-  const totalCarrito = carrito.reduce((acc, item) => acc + item.precio, 0);
+  const totalCarrito = carrito.reduce((acc, item) => acc + item.precioFinal, 0);
 
   const abrirWhatsAppConPedido = () => {
     if (carrito.length === 0) {
@@ -50,7 +52,7 @@ export default function App() {
     const resumen = carrito.reduce((acc, item) => {
       if (!acc[item.nombre]) acc[item.nombre] = { cantidad: 0, precio: 0 };
       acc[item.nombre].cantidad += 1;
-      acc[item.nombre].precio += item.precio;
+      acc[item.nombre].precio += item.precioFinal;
       return acc;
     }, {});
 
@@ -175,7 +177,7 @@ export default function App() {
               >
                 Ver catálogo
               </button>
-              
+
             </div>
           </section>
         )}
@@ -233,13 +235,18 @@ export default function App() {
                       <span>{item.cantidad}</span>
                       <button
                         onClick={() =>
-                          setCarrito((prev) => [...prev, { nombre: item.nombre, precio: item.precio }])
+                          setCarrito((prev) => [...prev, item])
                         }
                         className="px-2 py-0.5 bg-gray-200 rounded-full text-lg font-semibold"
                       >
                         +
                       </button>
-                      <span className="font-semibold">€ {(item.precio * item.cantidad).toFixed(2)}</span>
+                      <div className="text-right">
+                        {item.descuento > 0 && (
+                          <p className="text-xs text-green-600">-{item.descuento}%</p>
+                        )}
+                        <span className="font-semibold">€ {(item.precioFinal * item.cantidad).toFixed(2)}</span>
+                      </div>
                     </div>
                   </li>
                 ))}
@@ -250,6 +257,9 @@ export default function App() {
               <span>Total:</span>
               <span>€ {totalCarrito.toFixed(2)}</span>
             </div>
+            <p className="text-xs font-bold mt-2 text-center">
+              *Descuentos aplicados en el precio.
+            </p>
             <p className="text-xs mt-2 text-center">
               Actualmente los pedidos se realizan a través de whatsapp, si pulsa aquí cargará el carrito en el chat de whatsapp.
             </p>
@@ -262,7 +272,6 @@ export default function App() {
           </div>
         </div>
       )}
-
 
       <button
         className="fixed bottom-4 right-4 p-2 rounded-full shadow-lg hover:scale-105 transition"
